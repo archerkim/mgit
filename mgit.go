@@ -4,35 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func check(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func contains(IGNORE []string, name string) bool {
-	for _, ignore := range IGNORE {
-		if strings.EqualFold(ignore, name) {
-			return true
-		}
-	}
-	return false
-}
-
-func listFiles(pathname string) []string {
-	IGNORE := []string{".", "..", ".git"}
-	entries, err := os.ReadDir(pathname)
-	check(err)
-	var names []string
-	for _, entry := range entries {
-		if !contains(IGNORE, entry.Name()) {
-			names = append(names, entry.Name())
-		}
-	}
-	return names
 }
 
 func main() {
@@ -58,10 +35,19 @@ func main() {
 		fmt.Println("Initialized empty mgit repository in ", mgit_path)
 	case "commit":
 		root_path := filepath.Dir(".")
-		//mgit_path := filepath.Join(root_path, ".mgit")
-		//db_path := filepath.Join(mgit_path, "objects")
-
-		fmt.Println(listFiles(root_path))
+		mgit_path := filepath.Join(root_path, ".mgit")
+		db_path := filepath.Join(mgit_path, "objects")
+		db := database{pathname: db_path}
+		files := listFiles(root_path)
+		for _, file := range files {
+			data := readFile(filepath.Join(root_path, file))
+			blob := object{
+				oid:   "",
+				data:  data,
+				_type: "blob",
+			}
+			db.store(&blob)
+		}
 	default:
 		fmt.Printf("mgit: %s is not an mgit command\n", arg)
 	}
