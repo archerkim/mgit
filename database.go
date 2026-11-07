@@ -38,6 +38,8 @@ func (database *database) writeObject(oid string, content string) {
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			check(os.MkdirAll(dirname, 0755))
+		} else if errors.Is(err, os.ErrExist) {
+			return
 		} else {
 			log.Fatal(err)
 		}
