@@ -31,6 +31,11 @@ func (database *database) store(object *object) {
 
 func (database *database) writeObject(oid string, content string) {
 	path := filepath.Join(database.pathname, oid[:2], oid[2:])
+
+	if _, err := os.Stat(path); errors.Is(err, os.ErrExist) {
+		return
+	}
+
 	dirname := filepath.Dir(path)
 	temp_path := filepath.Join(dirname, genTempName())
 
