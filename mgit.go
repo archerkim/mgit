@@ -61,6 +61,7 @@ func main() {
 		}
 		db.store(&tree)
 
+		parent := readHead(mgit_path)
 		name := os.Getenv("GIT_AUTHOR_NAME")
 		email := os.Getenv("GIT_AUTHOR_EMAIL")
 
@@ -78,21 +79,25 @@ func main() {
 			"commiter " + author + "\n\n" +
 			message + "\n"
 
+		if parent == "" {
+			commit_data = "parent " + parent + "\n" + commit_data
+		}
+
 		commit := object{
 			oid:   "",
 			data:  []byte(commit_data),
 			_type: "commit",
 		}
 		db.store(&commit)
+		updateHead(commit.oid, mgit_path)
 
-		file, err := os.OpenFile(filepath.Join(mgit_path, "HEAD"), os.O_WRONLY|os.O_CREATE, 0644)
-		check(err)
-		defer file.Close()
-
-		_, err = file.WriteString(commit.oid)
-		check(err)
-
-		fmt.Printf("[(root-commit) %s] %s", commit.oid, firstLine)
+		var is_root string
+		if parent == "" {
+			is_root = "(root-commit) "
+		} else {
+			is_root = ""
+		}
+		fmt.Printf("[%s%s] %s", is_root, commit.oid, firstLine)
 	default:
 		fmt.Printf("mgit: %s is not an mgit command\n", arg)
 	}
