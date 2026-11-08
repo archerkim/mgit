@@ -1,0 +1,1 @@
+go build -C /Users/archerkim/mgit -o "/Users/archerkim/mgit/bin/mgit_" . && exec "/Users/archerkim/mgit/bin/mgit_" "$@"
