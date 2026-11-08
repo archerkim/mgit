@@ -2,18 +2,30 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 )
 
-func updateHead(oid string, path string) {
-	file, err := os.OpenFile(head_path(path), os.O_WRONLY|os.O_CREATE, 0644)
-	check(err)
-	defer file.Close()
-
-	_, err = file.WriteString(oid)
-	check(err)
+func updateHead(oid string, path string) error {
+	l := lockfile{
+		filePath: head_path(path),
+	}
+	isLocked, err := l.hold_for_update()
+	if isLocked {
+		return fmt.Errorf("Could not acquire lock on the file: %v", err)
+	}
+	if x := l.write(oid); x != nil {
+		return x
+	}
+	if x := l.write("\n"); x != nil {
+		return x
+	}
+	if x := l.commit(); x != nil {
+		return x
+	}
+	return nil
 }
 
 func readHead(path string) string {
