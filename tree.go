@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-const mode = "100644"
-
 func packTree(entries []entry) []byte {
 	sorted := slices.Clone(entries)
 	slices.SortFunc(sorted, func(a, b entry) int {
@@ -17,7 +15,8 @@ func packTree(entries []entry) []byte {
 
 	var buf bytes.Buffer
 	for _, e := range sorted {
-		buf.WriteString(mode + " ")
+		buf.WriteString(e.mode)
+		buf.WriteString(" ")
 		buf.WriteString(e.name)
 		buf.WriteByte(0)
 

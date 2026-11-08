@@ -1,3 +1,5 @@
+//usr/bin/env go run -C "$(dirname "$0")" . "$@"; exit
+
 package main
 
 import (
@@ -43,15 +45,19 @@ func main() {
 		db := database{pathname: db_path}
 		files := listFiles(root_path)
 		var entries []entry
+		var path string
 		for _, file := range files {
-			data := readFile(filepath.Join(root_path, file))
+			path = filepath.Join(root_path, file)
+			data := readFile(path)
 			blob := object{
 				oid:   "",
 				data:  data,
 				_type: "blob",
 			}
 			db.store(&blob)
-			entries = append(entries, entry{oid: blob.oid, name: file})
+			fileInfo, err := os.Stat(path)
+			check(err)
+			entries = append(entries, entry{oid: blob.oid, name: file, mode: returnMode(fileInfo)})
 		}
 		data := packTree(entries)
 		tree := object{
