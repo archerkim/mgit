@@ -13,11 +13,12 @@ type entry struct {
 
 func returnMode(info os.FileInfo) string {
 	mode := info.Mode()
-	if mode == 0644 {
+	switch mode {
+	case 0644:
 		return REGULAR_MODE
-	} else if mode == 0755 {
+	case 0755:
 		return EXECUTABLE_MODE
-	} else {
+	default:
 		return "undefined"
 	}
 }

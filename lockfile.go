@@ -35,7 +35,7 @@ func (l *lockfile) hold_for_update() (bool, error) {
 		l.lock = lock
 		return true, nil
 	}
-	return false, nil
+	return false, fmt.Errorf("Already locked by other process")
 }
 
 func (l *lockfile) write(str string) error {
