@@ -43,23 +43,7 @@ func main() {
 		mgit_path := filepath.Join(root_path, ".mgit")
 		db_path := filepath.Join(mgit_path, "objects")
 		db := database{pathname: db_path}
-		files := listFiles(root_path)
-		var entries []entry
-		var path string
-		for _, file := range files {
-			path = filepath.Join(root_path, file)
-			data := readFile(path)
-			blob := object{
-				oid:   "",
-				data:  data,
-				_type: "blob",
-			}
-			db.store(&blob)
-			fileInfo, err := os.Stat(path)
-			check(err)
-			entries = append(entries, entry{oid: blob.oid, name: file, mode: returnMode(fileInfo)})
-		}
-		data := packTree(entries)
+		data := packTree(db.buildTree(root_path))
 		tree := object{
 			oid:   "",
 			data:  data,

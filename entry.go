@@ -2,8 +2,9 @@ package main
 
 import "os"
 
-const REGULAR_MODE = "0644"
-const EXECUTABLE_MODE = "0755"
+const REGULAR_MODE = "100644"
+const EXECUTABLE_MODE = "100755"
+const DIRECTORY_MODE = "040000"
 
 type entry struct {
 	oid  string
@@ -13,12 +14,13 @@ type entry struct {
 
 func returnMode(info os.FileInfo) string {
 	mode := info.Mode()
-	switch mode {
-	case 0644:
+	if info.IsDir() {
+		return DIRECTORY_MODE
+	} else if mode == 0644 {
 		return REGULAR_MODE
-	case 0755:
+	} else if mode == 0755 {
 		return EXECUTABLE_MODE
-	default:
+	} else {
 		return "undefined"
 	}
 }
