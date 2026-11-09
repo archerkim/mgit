@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"compress/flate"
+	"compress/zlib"
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
@@ -71,7 +71,7 @@ func genTempName() string {
 func compressData(content []byte) []byte {
 	var buf bytes.Buffer
 
-	writer, err := flate.NewWriter(&buf, flate.BestSpeed)
+	writer, err := zlib.NewWriterLevel(&buf, zlib.BestSpeed)
 	if err != nil {
 		log.Fatal(err)
 	}
