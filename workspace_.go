@@ -16,7 +16,7 @@ func contains(IGNORE []string, name string) bool {
 }
 
 func listFiles(pathname string, dir ...string) []string {
-	IGNORE := []string{".", "..", ".git", ".mgit"}
+	IGNORE := []string{".", "..", ".git", ".mgit", "go.mod", ".profile", ".gitignore", "tools"}
 	var d string
 	if len(dir) > 0 {
 		d = dir[0]
