@@ -88,6 +88,47 @@ func main() {
 			is_root = ""
 		}
 		fmt.Printf("[%s%s] %s", is_root, commit.oid, firstLine)
+	case "add":
+		root_path := filepath.Dir(".")
+		mgit_path := filepath.Join(root_path, ".mgit")
+		db_path := filepath.Join(mgit_path, "objects")
+		ix_path := filepath.Join(mgit_path, "index")
+
+		_, err := os.OpenFile(ix_path, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0644)
+		check(err)
+
+		db := database{pathname: db_path}
+		entries := make(map[string]indexEntry)
+		lockfile := lockfile{
+			filePath: ix_path,
+		}
+		ix := index{
+			pathname: ix_path,
+			entries:  entries,
+			lockfile: lockfile,
+		}
+
+		var path string
+		if len(os.Args) == 3 {
+			path = os.Args[2]
+		} else {
+			fmt.Println("Invalid arguments")
+			os.Exit(1)
+		}
+
+		data := readFile(path)
+		stat, err := os.Stat(path)
+		check(err)
+
+		blob := object{
+			oid:   "",
+			data:  data,
+			_type: "blob",
+		}
+		db.store(&blob)
+
+		ix.add(path, blob.oid, stat)
+		ix.writeUpdates()
 	default:
 		fmt.Printf("mgit: %s is not an mgit command\n", arg)
 	}

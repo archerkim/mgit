@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 var (
@@ -72,5 +71,5 @@ func (l *lockfile) raise_on_stale_lock() error {
 }
 
 func lockPath(filePath string) string {
-	return filepath.Join(filePath, "lock")
+	return filePath + ".lock"
 }
